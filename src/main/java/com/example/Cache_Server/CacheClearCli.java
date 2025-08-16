@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 
 @Component
 @ConditionalOnNotWebApplication
-public class CacheClearCli{
+public class CacheClearCli {
 
     //We need to send a request to the server to clear the cache
     //so we cant implement application runner directly but we need to create a bean so that we can still read the cli args
@@ -18,28 +18,42 @@ public class CacheClearCli{
 
     @Value("${target.port}")
     private String port;
+
     @Bean
     RestClient restClient(RestClient.Builder builder) {
         return builder
-                .baseUrl("http://localhost:"+port)
+                .baseUrl("http://localhost:" + port)
                 .build();
     }
-    Logger log= LoggerFactory.getLogger(CacheClearCli.class);
 
+    Logger log = LoggerFactory.getLogger(CacheClearCli.class);
+    boolean clearCacheMode = false;
     @Bean
-    ApplicationRunner delete(RestClient restClient){
-        return args ->{
-            if(!args.getOptionNames().contains("--clear-cache")){
-                return ;}
+    ApplicationRunner delete(RestClient restClient) {
+        return args -> {
+            for (String arg : args.getSourceArgs()) {
+                if ("--clear-cache".equals(arg)) {
+                    log.info("Cache Clear Mode Enabled");
+                    clearCacheMode = true;
 
-            restClient
-                    .delete()
-                    .uri("/clear")
-                    .retrieve()
-                    .toBodilessEntity();
-            log.info("Cache Cleared");
-
+                }}
+            log.info("Cache Clearin in progresss...");
+            if(!clearCacheMode) {
+                log.info("Cache Clear Mode not enabled, skipping cache clear");
+                return;
+            }
+            // If clearCacheMode is true, proceed to clear the cache
+            try {
+                restClient
+                        .delete()
+                        .uri("/clear")
+                        .retrieve()
+                        .toBodilessEntity();
+                log.info("Cache Cleared");
+            } catch (Exception e) {
+                log.error("Failed to clear cache: {}", e.getMessage());
+            }
         };
-    }
 
+    }
 }

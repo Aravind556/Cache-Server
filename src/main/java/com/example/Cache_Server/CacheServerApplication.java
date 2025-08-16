@@ -22,8 +22,12 @@ public class CacheServerApplication {
 			if (arg.startsWith("--port=")) {
 				properties.put("server.port", arg.substring("--port=".length()));
 			}
+
 			if ("--clear-cache".equals(arg)) {
 				clearCacheMode = true;
+			}
+			if (arg.startsWith("--target.port=")) {
+				properties.put("target.port", arg.substring("--target.port=".length()));
 			}
 
 			// ---origin.url=https://...
