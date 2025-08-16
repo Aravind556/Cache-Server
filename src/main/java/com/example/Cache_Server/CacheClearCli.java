@@ -27,21 +27,17 @@ public class CacheClearCli {
     }
 
     Logger log = LoggerFactory.getLogger(CacheClearCli.class);
-    boolean clearCacheMode = false;
+
     @Bean
     ApplicationRunner delete(RestClient restClient) {
         return args -> {
             for (String arg : args.getSourceArgs()) {
                 if ("--clear-cache".equals(arg)) {
                     log.info("Cache Clear Mode Enabled");
-                    clearCacheMode = true;
+
 
                 }}
             log.info("Cache Clearin in progresss...");
-            if(!clearCacheMode) {
-                log.info("Cache Clear Mode not enabled, skipping cache clear");
-                return;
-            }
             // If clearCacheMode is true, proceed to clear the cache
             try {
                 restClient
